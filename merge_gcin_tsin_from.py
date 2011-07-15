@@ -19,7 +19,7 @@ def pull_and_merge( remote_filename ):
     if current and cloud:
         current_set = set(current)
         cloud_set = set(cloud)
-        if current_set | cloud_set:
+        if len( current_set ^ cloud_set ):
             merged = current_set | cloud_set
             write_back_merged_tsin( merged )
         else:

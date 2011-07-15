@@ -5,8 +5,6 @@ TSD2A32 = "/usr/bin/tsd2a32"
 TSA2D32 = "/usr/bin/tsa2d32"
 USER_GCIN_DIR = os.path.expanduser( "~/.gcin" )
 USER_TSIN32 = os.path.join( USER_GCIN_DIR, "tsin32" )
-DROPBOX_TSIN32_TXT = os.path.expanduser( 
-        "~/Dropbox/linux/common/tsin32.txt" )
 
 def are_tools_existed():
     """
@@ -43,13 +41,13 @@ def get_list_from_current_tsin32():
     f = subprocess.Popen( args, stdout=subprocess.PIPE ).stdout
     return parse_file_and_get_list( f )
 
-def get_list_from_dropbox_tsin32_txt():
+def get_list_from_remote( remote_filename ):
     """
     Parse the text file in Dropbox and get a list.
     """
     tsin = []
-    if os.path.exists( DROPBOX_TSIN32_TXT ):
-        f = open( DROPBOX_TSIN32_TXT )
+    if os.path.exists( remote_filename ):
+        f = open( remote_filename )
         tsin = parse_file_and_get_list( f )
     return tsin
 

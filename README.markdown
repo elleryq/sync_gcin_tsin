@@ -2,9 +2,9 @@ Usage
 =====
 Push to Dropbox folder:
 
-> $ python push.py
+> $ python push_gcin_tsin.py
 
 Pull from Dropbox folder and merge:
 
-> $ python pull_and_merge.py
+> $ python merge_gcin_tsin_from.py
 

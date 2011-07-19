@@ -1,0 +1,9 @@
+Usage
+=====
+Push to Dropbox folder:
+ $ python push_gcin_tsin.py ~/Dropbox/tsin32.txt
+
+Pull from Dropbox folder or specified URL and merge:
+ $ python merge_gcin_tsin_from.py ~/Dropbox/tsin32.txt
+ $ python merge_gcin_tsin_from.py http://your_host/your_path/tsin32.txt
+

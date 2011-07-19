@@ -26,10 +26,13 @@ def parse_file_and_get_list( f ):
     """
     r = []
     if f:
-        for line in f:
-            t = line.split()
-            r.append( tuple(t) )
-        f.close()
+        try:
+            for line in f:
+                t = line.split()
+                r.append( tuple(t) )
+            f.close()
+        except e:
+            print( e.reason )
     return r
 
 def get_list_from_current_tsin32():
@@ -45,9 +48,23 @@ def get_list_from_remote( remote_filename ):
     """
     Parse the text file in Dropbox and get a list.
     """
+    from urlparse import urlparse
+    r = urlparse( remote_filename )
+    f = None
+    if r.scheme=="":
+        if os.path.exists( r.path ):
+            f = open( r.path )
+        else:
+            print( "%s is not found." % remote_filename )
+    elif r.scheme in ["http", "ftp", "https"]:
+        from urllib2 import Request, urlopen
+        req = Request( r.geturl() )
+        try:
+            f = urlopen(req)
+        except e:
+            print e.reason
     tsin = []
-    if os.path.exists( remote_filename ):
-        f = open( remote_filename )
+    if f:
         tsin = parse_file_and_get_list( f )
     return tsin
 

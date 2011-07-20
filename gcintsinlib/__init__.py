@@ -1,10 +1,45 @@
 import os
 import subprocess
+import platform
 
-TSD2A32 = "/usr/bin/tsd2a32"
-TSA2D32 = "/usr/bin/tsa2d32"
-USER_GCIN_DIR = os.path.expanduser( "~/.gcin" )
+system_name = platform.system()
+if system_name == "Windows":
+    TSD2A32 = r"C:\Program Files\gcin\bin\tsd2a32.exe"
+    TSA2D32 = r"C:\Program Files\gcin\bin\tsa2d32.exe"
+    home = os.path.expanduser( "~" )
+    app_data_dir = get_application_data_folder()
+    USER_GCIN_DIR = os.path.join( home, app_data_dir, "gcin" )
+else:
+    TSD2A32 = "/usr/bin/tsd2a32"
+    TSA2D32 = "/usr/bin/tsa2d32"
+    USER_GCIN_DIR = os.path.expanduser( "~/.gcin" )
+
 USER_TSIN32 = os.path.join( USER_GCIN_DIR, "tsin32" )
+
+def get_application_data_folder():
+    """
+    Get User's "Application Data" folder in Windows.
+    Reference:
+     * http://stackoverflow.com/questions/626796/how-do-i-find-the-windows-common-application-data-folder-using-python
+    """
+    import ctypes
+    from ctypes import wintypes, windll
+    CSIDL_APPDATA = 26
+    _SHGetFolderPath = windll.shell32.SHGetFolderPathW
+    _SHGetFolderPath.argtypes = [wintypes.HWND,
+                                ctypes.c_int,
+                                wintypes.HANDLE,
+                                wintypes.DWORD, wintypes.LPCWSTR]
+
+    path_buf = wintypes.create_unicode_buffer(wintypes.MAX_PATH)
+    result = _SHGetFolderPath(0, CSIDL_APPDATA, 0, 0, path_buf)
+    return path_buf.value
+
+def print_exception( e ):
+    if e.has_attr( 'reason' ):
+        print( e.reason )
+    else:
+        print( e )
 
 def are_tools_existed():
     """
@@ -32,10 +67,7 @@ def parse_file_and_get_list( f ):
                 r.append( tuple(t) )
             f.close()
         except e:
-            if e.has_attr( 'reason' ):
-                print( e.reason )
-            else:
-                print( e )
+            print_exception( e )
     return r
 
 def get_list_from_current_tsin32():
@@ -65,10 +97,7 @@ def get_list_from_remote( remote_filename ):
         try:
             f = urlopen(req)
         except e:
-            if e.has_attr( 'reason' ):
-                print( e.reason )
-            else:
-                print( e )
+            print_exception( e )
     tsin = []
     if f:
         tsin = parse_file_and_get_list( f )

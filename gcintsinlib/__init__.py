@@ -32,7 +32,10 @@ def parse_file_and_get_list( f ):
                 r.append( tuple(t) )
             f.close()
         except e:
-            print( e.reason )
+            if e.has_attr( 'reason' ):
+                print( e.reason )
+            else:
+                print( e )
     return r
 
 def get_list_from_current_tsin32():
@@ -62,7 +65,10 @@ def get_list_from_remote( remote_filename ):
         try:
             f = urlopen(req)
         except e:
-            print e.reason
+            if e.has_attr( 'reason' ):
+                print( e.reason )
+            else:
+                print( e )
     tsin = []
     if f:
         tsin = parse_file_and_get_list( f )

@@ -2,20 +2,6 @@ import os
 import subprocess
 import platform
 
-system_name = platform.system()
-if system_name == "Windows":
-    TSD2A32 = r"C:\Program Files\gcin\bin\tsd2a32.exe"
-    TSA2D32 = r"C:\Program Files\gcin\bin\tsa2d32.exe"
-    home = os.path.expanduser( "~" )
-    app_data_dir = get_application_data_folder()
-    USER_GCIN_DIR = os.path.join( home, app_data_dir, "gcin" )
-else:
-    TSD2A32 = "/usr/bin/tsd2a32"
-    TSA2D32 = "/usr/bin/tsa2d32"
-    USER_GCIN_DIR = os.path.expanduser( "~/.gcin" )
-
-USER_TSIN32 = os.path.join( USER_GCIN_DIR, "tsin32" )
-
 def get_application_data_folder():
     """
     Get User's "Application Data" folder in Windows.
@@ -34,6 +20,20 @@ def get_application_data_folder():
     path_buf = wintypes.create_unicode_buffer(wintypes.MAX_PATH)
     result = _SHGetFolderPath(0, CSIDL_APPDATA, 0, 0, path_buf)
     return path_buf.value
+
+system_name = platform.system()
+if system_name == "Windows":
+    TSD2A32 = r"C:\Program Files\gcin\bin\tsd2a32.exe"
+    TSA2D32 = r"C:\Program Files\gcin\bin\tsa2d32.exe"
+    home = os.path.expanduser( "~" )
+    app_data_dir = get_application_data_folder()
+    USER_GCIN_DIR = os.path.join( home, app_data_dir, "gcin" )
+else:
+    TSD2A32 = "/usr/bin/tsd2a32"
+    TSA2D32 = "/usr/bin/tsa2d32"
+    USER_GCIN_DIR = os.path.expanduser( "~/.gcin" )
+
+USER_TSIN32 = os.path.join( USER_GCIN_DIR, "tsin32" )
 
 def print_exception( e ):
     if e.has_attr( 'reason' ):

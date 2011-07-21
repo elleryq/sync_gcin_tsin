@@ -24,6 +24,11 @@ def get_application_data_folder():
 system_name = platform.system()
 python_version = platform.python_version_tuple()[0]
 
+if python_version == "3":
+    import sys
+    print( "Not supported yet!!" )
+    sys.exit(-1)
+
 if system_name == "Windows":
     TSD2A32 = r"C:\Program Files\gcin\bin\tsd2a32.exe"
     TSA2D32 = r"C:\Program Files\gcin\bin\tsa2d32.exe"
@@ -38,10 +43,7 @@ else:
 USER_TSIN32 = os.path.join( USER_GCIN_DIR, "tsin32" )
 
 def print_exception( e ):
-    if e.has_attr( 'reason' ):
-        print( e.reason )
-    else:
-        print( e )
+    print( e )
 
 def are_tools_existed():
     """
@@ -68,7 +70,7 @@ def parse_file_and_get_list( f ):
                 t = line.split()
                 r.append( tuple(t) )
             f.close()
-        except e:
+        except Exception as e:
             print_exception( e )
     return r
 
@@ -104,20 +106,32 @@ def get_list_from_remote( remote_filename ):
         req = Request( r.geturl() )
         try:
             f = urlopen(req)
-        except e:
+        except Exception as e:
             print_exception( e )
     tsin = []
     if f:
         tsin = parse_file_and_get_list( f )
     return tsin
 
+def convert_tuple_to_string( t ):
+    if python_version=="3":
+        s = b''
+        try:
+            s = (b' '.join( t )).decode('utf-8') + '\n'
+        except Exception as e:
+            print_exception( e )
+        return s
+    else:
+        return ' '.join(t) + '\n'
+
 def write_tsin( f, s ):
     """
     The element in s is tuple.
     Write the tuple to file.
     """
+    import sys
     for t in s:
-        f.write( '%s\n' % ' '.join( t ) )
+        f.write( '%s\n' % ' '.join(t) )
     f.close()
 
 def write_back_merged_tsin( s ):
@@ -126,6 +140,7 @@ def write_back_merged_tsin( s ):
     Then use TSA2D32 to convert text file to tsin32
     """
     import tempfile
+#f = tempfile.NamedTemporaryFile( delete=False, mode="wb" )
     f = tempfile.NamedTemporaryFile( delete=False )
     write_tsin( f, s )
     args = [ TSA2D32, f.name ]

@@ -17,7 +17,7 @@ def get_application_data_folder():
                                 wintypes.HANDLE,
                                 wintypes.DWORD, wintypes.LPCWSTR]
 
-    path_buf = wintypes.create_unicode_buffer(wintypes.MAX_PATH)
+    path_buf = ctypes.create_unicode_buffer(wintypes.MAX_PATH)
     result = _SHGetFolderPath(0, CSIDL_APPDATA, 0, 0, path_buf)
     return path_buf.value
 

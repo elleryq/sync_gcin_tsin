@@ -22,6 +22,7 @@ def pull_and_merge( remote_filename ):
         if len( current_set ^ cloud_set ):
             merged = current_set | cloud_set
             write_back_merged_tsin( merged )
+            print( "done." )
         else:
             print( "Same, skip to merge." )
     else:

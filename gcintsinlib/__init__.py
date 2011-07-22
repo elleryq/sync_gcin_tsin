@@ -2,6 +2,14 @@ import os
 import subprocess
 import platform
 
+python_version = platform.python_version_tuple()[0]
+if python_version == "3":
+    from urllib.request import Request, urlopen
+    from urllib.parse import urlparse
+else:
+    from urllib2 import Request, urlopen
+    from urlparse import urlparse
+
 def get_application_data_folder():
     """
     Get User's "Application Data" folder in Windows.
@@ -22,7 +30,6 @@ def get_application_data_folder():
     return path_buf.value
 
 system_name = platform.system()
-python_version = platform.python_version_tuple()[0]
 
 if system_name == "Windows":
     TSD2A32 = r"C:\Program Files\gcin\bin\tsd2a32.exe"
@@ -82,10 +89,6 @@ def get_list_from_remote( remote_filename ):
     """
     Parse the text file in Dropbox and get a list.
     """
-    if python_version=="3":
-        from urllib.parse import urlparse
-    else:
-        from urlparse import urlparse
     r = urlparse( remote_filename )
     f = None
     if r.scheme=="":
@@ -94,10 +97,6 @@ def get_list_from_remote( remote_filename ):
         else:
             print( "%s is not found." % remote_filename )
     elif r.scheme in ["http", "ftp", "https"]:
-        if python_version == "3":
-            from urllib.request import Request, urlopen
-        else:
-            from urllib2 import Request, urlopen
         req = Request( r.geturl() )
         try:
             f = urlopen(req)

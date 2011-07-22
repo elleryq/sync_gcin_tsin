@@ -136,10 +136,9 @@ def write_back_merged_tsin( s ):
     Then use TSA2D32 to convert text file to tsin32
     """
     import tempfile
-#f = tempfile.NamedTemporaryFile( delete=False, mode="wb" )
     f = tempfile.NamedTemporaryFile( delete=False )
     write_tsin( f, s )
     args = [ TSA2D32, f.name ]
     subprocess.call( args, cwd=USER_GCIN_DIR )
-#os.unlink( f.name )
+    os.unlink( f.name )
 

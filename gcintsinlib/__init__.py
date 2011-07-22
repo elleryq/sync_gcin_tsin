@@ -92,8 +92,9 @@ def get_list_from_remote( remote_filename ):
     r = urlparse( remote_filename )
     f = None
     if r.scheme=="":
-        if os.path.exists( r.path ):
-            f = open( r.path, "rb" )
+        filename = os.path.expanduser( r.path )
+        if os.path.exists( filename ):
+            f = open( filename, "rb" )
         else:
             print( "%s is not found." % remote_filename )
     elif r.scheme in ["http", "ftp", "https"]:
@@ -114,9 +115,9 @@ def convert_tuple_to_string( t ):
             s = (b' '.join( t )).decode('utf-8') + '\n'
         except Exception as e:
             print_exception( e )
-        return s
     else:
-        return ' '.join(t) + '\n'
+        s = ' '.join(t) + '\n'
+    return s
 
 def write_tsin( f, s ):
     """
@@ -125,7 +126,8 @@ def write_tsin( f, s ):
     """
     import sys
     for t in s:
-        f.write( '%s\n' % ' '.join(t) )
+        if len(t)>=2:
+            f.write( convert_tuple_to_string( t ) )
     f.close()
 
 def write_back_merged_tsin( s ):
@@ -139,5 +141,5 @@ def write_back_merged_tsin( s ):
     write_tsin( f, s )
     args = [ TSA2D32, f.name ]
     subprocess.call( args, cwd=USER_GCIN_DIR )
-    os.unlink( f.name )
+#os.unlink( f.name )
 

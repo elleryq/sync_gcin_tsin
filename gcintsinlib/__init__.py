@@ -24,11 +24,6 @@ def get_application_data_folder():
 system_name = platform.system()
 python_version = platform.python_version_tuple()[0]
 
-if python_version == "3":
-    import sys
-    print( "Not supported yet!!" )
-    sys.exit(-1)
-
 if system_name == "Windows":
     TSD2A32 = r"C:\Program Files\gcin\bin\tsd2a32.exe"
     TSA2D32 = r"C:\Program Files\gcin\bin\tsa2d32.exe"
@@ -95,7 +90,7 @@ def get_list_from_remote( remote_filename ):
     f = None
     if r.scheme=="":
         if os.path.exists( r.path ):
-            f = open( r.path )
+            f = open( r.path, "rb" )
         else:
             print( "%s is not found." % remote_filename )
     elif r.scheme in ["http", "ftp", "https"]:

@@ -1,4 +1,5 @@
 import os
+import sys
 import subprocess
 import platform
 
@@ -6,9 +7,13 @@ python_version = platform.python_version_tuple()[0]
 if python_version == "3":
     from urllib.request import Request, urlopen
     from urllib.parse import urlparse
+    from winreg import OpenKey, QueryValueEx
+    from winreg import HKEY_LOCAL_MACHINE, KEY_ALL_ACCESS, REG_SZ
 else:
     from urllib2 import Request, urlopen
     from urlparse import urlparse
+    from _winreg import OpenKey, QueryValueEx
+    from _winreg import HKEY_LOCAL_MACHINE, KEY_ALL_ACCESS, REG_SZ
 
 def get_application_data_folder():
     """
@@ -32,8 +37,14 @@ def get_application_data_folder():
 system_name = platform.system()
 
 if system_name == "Windows":
-    TSD2A32 = r"C:\Program Files\gcin\bin\tsd2a32.exe"
-    TSA2D32 = r"C:\Program Files\gcin\bin\tsa2d32.exe"
+    key = OpenKey(HKEY_LOCAL_MACHINE, r'Software\gcin', 0, KEY_ALL_ACCESS)
+    gcin_install_dir, key_type = QueryValueEx(key, "Install_Dir")
+    if not gcin_install_dir or not key_type == REG_SZ:
+        print( "Cannot read gcin's installed directory from registry." )
+        sys.exit(-1)
+    TSD2A32 = os.path.join( gcin_install_dir, "bin", "tsd2a32.exe" )
+    TSA2D32 = os.path.join( gcin_install_dir, "bin", "tsa2d32.exe" )
+
     home = os.path.expanduser( "~" )
     app_data_dir = get_application_data_folder()
     USER_GCIN_DIR = os.path.join( home, app_data_dir, "gcin" )

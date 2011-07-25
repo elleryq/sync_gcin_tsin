@@ -7,13 +7,9 @@ python_version = platform.python_version_tuple()[0]
 if python_version == "3":
     from urllib.request import Request, urlopen
     from urllib.parse import urlparse
-    from winreg import OpenKey, QueryValueEx
-    from winreg import HKEY_LOCAL_MACHINE, KEY_ALL_ACCESS, REG_SZ
 else:
     from urllib2 import Request, urlopen
     from urlparse import urlparse
-    from _winreg import OpenKey, QueryValueEx
-    from _winreg import HKEY_LOCAL_MACHINE, KEY_ALL_ACCESS, REG_SZ
 
 def get_application_data_folder():
     """
@@ -37,6 +33,13 @@ def get_application_data_folder():
 system_name = platform.system()
 
 if system_name == "Windows":
+    if python_version == "3":
+        from winreg import OpenKey, QueryValueEx
+        from winreg import HKEY_LOCAL_MACHINE, KEY_ALL_ACCESS, REG_SZ
+    else:
+        from _winreg import OpenKey, QueryValueEx
+        from _winreg import HKEY_LOCAL_MACHINE, KEY_ALL_ACCESS, REG_SZ
+
     key = OpenKey(HKEY_LOCAL_MACHINE, r'Software\gcin', 0, KEY_ALL_ACCESS)
     gcin_install_dir, key_type = QueryValueEx(key, "Install_Dir")
     if not gcin_install_dir or not key_type == REG_SZ:

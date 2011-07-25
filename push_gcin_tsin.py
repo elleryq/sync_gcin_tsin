@@ -12,7 +12,7 @@ def push( remote_file ):
         return -1
 
     dirname = os.path.dirname( remote_file )
-    if dirname:
+    if dirname and not os.path.exists(dirname):
         os.makedirs( dirname )
 
     write_tsin( open( 

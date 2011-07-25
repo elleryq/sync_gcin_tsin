@@ -122,15 +122,15 @@ def get_list_from_remote( remote_filename ):
         tsin = parse_file_and_get_list( f )
     return tsin
 
-def convert_tuple_to_string( t ):
+def convert_tuple_to_bytes( t ):
     if python_version=="3":
         s = b''
         try:
-            s = (b' '.join( t )).decode('utf-8') + '\n'
+            s = b' '.join( t ) + bytes( os.linesep, 'utf-8' )
         except Exception as e:
             print_exception( e )
     else:
-        s = ' '.join(t) + '\n'
+        s = ' '.join(t) + os.linesep
     return s
 
 def write_tsin( f, s ):
@@ -141,7 +141,7 @@ def write_tsin( f, s ):
     import sys
     for t in s:
         if len(t)>=2:
-            f.write( convert_tuple_to_string( t ) )
+            f.write( convert_tuple_to_bytes( t ) )
     f.close()
 
 def write_back_merged_tsin( s ):

@@ -13,7 +13,7 @@ def push( remote_file ):
 
     dirname = os.path.dirname( remote_file )
     if dirname:
-        os.mkdirs( dirname )
+        os.makedirs( dirname )
 
     write_tsin( open( 
                 remote_file, "wb"

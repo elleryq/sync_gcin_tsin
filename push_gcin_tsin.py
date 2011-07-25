@@ -11,10 +11,12 @@ def push( remote_file ):
     if not are_tools_existed():
         return -1
 
-    os.system( "mkdir -p \"%s\"" % (
-                os.path.dirname( remote_file ) ) )
+    dirname = os.path.dirname( remote_file )
+    if dirname:
+        os.mkdirs( dirname )
+
     write_tsin( open( 
-                remote_file, "w" 
+                remote_file, "wb"
                 ), get_list_from_current_tsin32() )
     print( "Done." )
     return 0

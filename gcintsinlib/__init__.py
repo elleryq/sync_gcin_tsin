@@ -34,14 +34,28 @@ system_name = platform.system()
 
 if system_name == "Windows":
     if python_version == "3":
-        from winreg import OpenKey, QueryValueEx
-        from winreg import HKEY_LOCAL_MACHINE, KEY_ALL_ACCESS, REG_SZ
+        from winreg import OpenKeyEx, QueryValueEx
+        from winreg import HKEY_LOCAL_MACHINE, REG_SZ
+        from winreg import KEY_ALL_ACCESS
+        from winreg import KEY_WOW64_64KEY, KEY_WOW64_32KEY
     else:
         from _winreg import OpenKey, QueryValueEx
-        from _winreg import HKEY_LOCAL_MACHINE, KEY_ALL_ACCESS, REG_SZ
+        from _winreg import HKEY_LOCAL_MACHINE, REG_SZ
+        from _winreg import KEY_ALL_ACCESS
+        from _winreg import KEY_WOW64_64KEY, KEY_WOW64_32KEY
 
-    key = OpenKey(HKEY_LOCAL_MACHINE, r'Software\gcin', 0, KEY_ALL_ACCESS)
-    gcin_install_dir, key_type = QueryValueEx(key, "Install_Dir")
+    sam_desired = KEY_ALL_ACCESS
+    if platform.architecture()[0]=="64bit":
+        # TODO: Need to clarify
+        #sam_desired = sam_desired | KEY_WOW64_64KEY
+        sam_desired = sam_desired | KEY_WOW64_32KEY
+    try:
+        key = OpenKeyEx(
+                HKEY_LOCAL_MACHINE, r'Software\gcin', 0, sam_desired )
+        gcin_install_dir, key_type = QueryValueEx(key, "Install_Dir")
+    except Exception as e:
+        print( e )
+        gcin_install_dir = None
     if not gcin_install_dir or not key_type == REG_SZ:
         print( "Cannot read gcin's installed directory from registry." )
         sys.exit(-1)

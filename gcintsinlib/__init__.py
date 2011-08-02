@@ -36,18 +36,16 @@ if system_name == "Windows":
     if python_version == "3":
         from winreg import OpenKeyEx, QueryValueEx
         from winreg import HKEY_LOCAL_MACHINE, REG_SZ
-        from winreg import KEY_ALL_ACCESS
+        from winreg import KEY_READ
         from winreg import KEY_WOW64_64KEY, KEY_WOW64_32KEY
     else:
         from _winreg import OpenKey, QueryValueEx
         from _winreg import HKEY_LOCAL_MACHINE, REG_SZ
-        from _winreg import KEY_ALL_ACCESS
+        from _winreg import KEY_READ
         from _winreg import KEY_WOW64_64KEY, KEY_WOW64_32KEY
 
-    sam_desired = KEY_ALL_ACCESS
+    sam_desired = KEY_READ
     if platform.architecture()[0]=="64bit":
-        # TODO: Need to clarify
-        #sam_desired = sam_desired | KEY_WOW64_64KEY
         sam_desired = sam_desired | KEY_WOW64_32KEY
     try:
         key = OpenKeyEx(

@@ -16,7 +16,7 @@ def pull_and_merge( remote_filename ):
 
     current = get_list_from_current_tsin32()
     cloud = get_list_from_remote( remote_filename )
-    if current and cloud:
+    if cloud:
         current_set = set(current)
         cloud_set = set(cloud)
         if len( current_set ^ cloud_set ):
@@ -26,8 +26,10 @@ def pull_and_merge( remote_filename ):
         else:
             print( "Same, skip to merge." )
     else:
-        print( '%s or %s is empty.' % (
-                    USER_TSIN32, remote_filename ) )
+        print( 'Recently there are %d phrases.' % (
+                    len( current ) ) )
+        print( '%s is empty, skip to merge.' % (
+                    remote_filename ) )
     return 0
 
 def main(arg):

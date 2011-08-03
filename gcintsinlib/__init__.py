@@ -1,4 +1,5 @@
 import os
+import sys
 import subprocess
 import platform
 
@@ -32,8 +33,33 @@ def get_application_data_folder():
 system_name = platform.system()
 
 if system_name == "Windows":
-    TSD2A32 = r"C:\Program Files\gcin\bin\tsd2a32.exe"
-    TSA2D32 = r"C:\Program Files\gcin\bin\tsa2d32.exe"
+    if python_version == "3":
+        from winreg import OpenKeyEx, QueryValueEx
+        from winreg import HKEY_LOCAL_MACHINE, REG_SZ
+        from winreg import KEY_READ
+        from winreg import KEY_WOW64_64KEY, KEY_WOW64_32KEY
+    else:
+        from _winreg import OpenKey, QueryValueEx
+        from _winreg import HKEY_LOCAL_MACHINE, REG_SZ
+        from _winreg import KEY_READ
+        from _winreg import KEY_WOW64_64KEY, KEY_WOW64_32KEY
+
+    sam_desired = KEY_READ
+    if platform.architecture()[0]=="64bit":
+        sam_desired = sam_desired | KEY_WOW64_32KEY
+    try:
+        key = OpenKeyEx(
+                HKEY_LOCAL_MACHINE, r'Software\gcin', 0, sam_desired )
+        gcin_install_dir, key_type = QueryValueEx(key, "Install_Dir")
+    except Exception as e:
+        print( e )
+        gcin_install_dir = None
+    if not gcin_install_dir or not key_type == REG_SZ:
+        print( "Cannot read gcin's installed directory from registry." )
+        sys.exit(-1)
+    TSD2A32 = os.path.join( gcin_install_dir, "bin", "tsd2a32.exe" )
+    TSA2D32 = os.path.join( gcin_install_dir, "bin", "tsa2d32.exe" )
+
     home = os.path.expanduser( "~" )
     app_data_dir = get_application_data_folder()
     USER_GCIN_DIR = os.path.join( home, app_data_dir, "gcin" )
@@ -108,15 +134,15 @@ def get_list_from_remote( remote_filename ):
         tsin = parse_file_and_get_list( f )
     return tsin
 
-def convert_tuple_to_string( t ):
+def convert_tuple_to_bytes( t ):
     if python_version=="3":
         s = b''
         try:
-            s = (b' '.join( t )).decode('utf-8') + '\n'
+            s = b' '.join( t ) + bytes( os.linesep, 'utf-8' )
         except Exception as e:
             print_exception( e )
     else:
-        s = ' '.join(t) + '\n'
+        s = ' '.join(t) + os.linesep
     return s
 
 def write_tsin( f, s ):
@@ -127,7 +153,7 @@ def write_tsin( f, s ):
     import sys
     for t in s:
         if len(t)>=2:
-            f.write( convert_tuple_to_string( t ) )
+            f.write( convert_tuple_to_bytes( t ) )
     f.close()
 
 def write_back_merged_tsin( s ):
@@ -136,7 +162,13 @@ def write_back_merged_tsin( s ):
     Then use TSA2D32 to convert text file to tsin32
     """
     import tempfile
-    f = tempfile.NamedTemporaryFile( delete=False )
+    kwargs = {
+            "delete": False,
+            "mode": "wt",
+            }
+    if python_version=="3":
+        kwargs[ "encoding" ] = "utf-8"
+    f = tempfile.NamedTemporaryFile( **kwargs )
     write_tsin( f, s )
     args = [ TSA2D32, f.name ]
     subprocess.call( args, cwd=USER_GCIN_DIR )

@@ -115,20 +115,31 @@ def get_list_from_remote( remote_filename ):
     """
     Parse the text file in Dropbox and get a list.
     """
-    r = urlparse( remote_filename )
+    if not '://' in remote_filename:
+        url = 'file:///%s' % remote_filename
+    else:
+        url = remote_filename
+    r = urlparse( url )
     f = None
-    if r.scheme=="":
-        filename = os.path.expanduser( r.path )
+    if r.scheme == 'file':
+        if system_name == "Windows":
+            filename = os.path.expanduser( r.path.replace( '\\', '/' ) )
+            if filename.startswith( '/' ):
+                filename = filename[1:]
+        else:
+            filename = os.path.expanduser( r.path )
         if os.path.exists( filename ):
             f = open( filename, "rb" )
         else:
-            print( "%s is not found." % remote_filename )
+            print( "%s is not found." % filename )
     elif r.scheme in ["http", "ftp", "https"]:
         req = Request( r.geturl() )
         try:
             f = urlopen(req)
         except Exception as e:
             print_exception( e )
+    else:
+        print( "Unknown protocol, return empty list." )
     tsin = []
     if f:
         tsin = parse_file_and_get_list( f )
@@ -167,7 +178,8 @@ def write_back_merged_tsin( s ):
             "mode": "wt",
             }
     if python_version=="3":
-        kwargs[ "encoding" ] = "utf-8"
+        #kwargs[ "encoding" ] = "utf-8"
+        kwargs[ "mode" ] = "wb"
     f = tempfile.NamedTemporaryFile( **kwargs )
     write_tsin( f, s )
     args = [ TSA2D32, f.name ]

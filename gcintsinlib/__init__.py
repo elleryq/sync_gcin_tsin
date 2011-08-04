@@ -122,12 +122,13 @@ def get_list_from_remote( remote_filename ):
     r = urlparse( url )
     f = None
     if r.scheme == 'file':
+        path = r.path
+        if r.path.startswith( '/' ):
+            path = r.path[1:]
         if system_name == "Windows":
-            filename = os.path.expanduser( r.path.replace( '\\', '/' ) )
-            if filename.startswith( '/' ):
-                filename = filename[1:]
+            filename = os.path.expanduser( path.replace( '\\', '/' ) )
         else:
-            filename = os.path.expanduser( r.path )
+            filename = os.path.expanduser( path )
         if os.path.exists( filename ):
             f = open( filename, "rb" )
         else:

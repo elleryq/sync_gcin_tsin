@@ -28,6 +28,8 @@ def pull_and_merge( remote_filename ):
     else:
         print( 'Recently there are %d phrases.' % (
                     len( current ) ) )
+        print( 'There are %d phrases in Remote.' % (
+                    len( cloud ) ) )
         print( '%s is empty, skip to merge.' % (
                     remote_filename ) )
     return 0
